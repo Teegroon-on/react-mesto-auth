@@ -1,3 +1,4 @@
+import { api } from "./api";
 class Auth {
   constructor(baseUrl) {
     this._baseUrl = baseUrl;
@@ -9,6 +10,12 @@ class Auth {
     });
   }
 
+  _checkResponse(res) {
+    if (res.ok) return res.json();
+    return this._getErrorFromServer(res);
+
+  }
+
   register({email, password}) {
     const url = `${this._baseUrl}/signup`;
     return fetch(url, {
@@ -18,10 +25,7 @@ class Auth {
       },
       body: JSON.stringify({email, password}),
     })
-      .then(res => {
-        if (res.ok) return res.json();
-        return this._getErrorFromServer(res);
-      });
+      .then(this._checkResponse);
   }
 
   authorize({email, password}) {
@@ -33,10 +37,7 @@ class Auth {
       },
       body: JSON.stringify({email, password}),
     })
-      .then(res => {
-        if (res.ok) return res.json();
-        return this._getErrorFromServer(res);
-      });
+      .then(this._checkResponse);
   }
 
   checkToken(token) {
@@ -48,10 +49,7 @@ class Auth {
         "Authorization" : `Bearer ${token}`
       },
     })
-      .then(res => {
-        if (res.ok) return res.json();
-        return this._getErrorFromServer(res);
-      });
+      .then(this._checkResponse);
   }
 }
 
